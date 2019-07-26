@@ -1,4 +1,6 @@
 package Simulation
+import java.util.UUID
+
 import code._
 import Owner._
 
@@ -13,7 +15,7 @@ trait Sim {
   // END state
 
   protected def algo   : Instruction
-  private   var algo_c : Vector[SimpleInstruction] = compile(algo)
+  var algo_c : Vector[SimpleInstruction] = compile(algo)
 
   /** Call from the constructor in inheriting classes. */
   protected def init(start_time: T) {
@@ -57,16 +59,24 @@ trait SimpleSim extends Sim {
 abstract class SimO(
   shared: Simulation,
   start_time: Int = 0
-) extends Seller with Sim {
+) extends Sim {
+  def id: AgentId
   init(start_time);
 
+  var inputMessages: List[Message] = List[Message]()
+  var outputMessages: List[Message] = List[Message]()
+  var sessions: List[UUID] = List[UUID]()
+  val sharedProxy = new SimulationProxy(this)
+
   protected def copy_state_to(_to: SimO) = {
-    super[Seller].copy_state_to(_to);
     super[Sim].copy_state_to(_to);
   }
 
   def mycopy(_shared: Simulation,
              _substitution: collection.mutable.Map[SimO, SimO]): SimO
+
+  def stat
+
 }
 
 

@@ -1,7 +1,7 @@
 package object Owner {
 import Securities._
 
-type ITEM_T = Security
+  type ITEM_T = Security
 
 }
 

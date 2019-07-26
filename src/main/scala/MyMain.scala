@@ -1,32 +1,12 @@
 package Simulation
-import SimLib._
-import Securities.Commodities._
 
 
 object MainExample {
   val s = new Simulation;
 
-  val f   = new Farm(s);
-  val m   = new Mill(s);
-  //val c   = new Cinema(s);
-  //val rf  = new CattleFarm(s);
-  //val mcd = new McDonalds(s);
-  val landlord        = new Source(Land,  20, 100000*100, s);
-  //val freudensprung = new Source(Beef,   100,  26000*100, s);
-  //val silo          = new Source(Wheat, 1000,   6668*100, s);
-  //val silo2         = new Trader(Whear, 100, s);
-  //val billa         = new Trader(Flour, 50, s);
-  val mehlbuyer     = new Buyer(Flour, () => 40, s);
-
-  val people = for(x <- 1 to 12) yield new Person(s, false);
+  val people = for(x <- 0 to 3) yield new Person(s, true, id=x);
 
   s.init(List(
-    landlord,
-    //silo,
-    // silo2, billa, freudensprung,
-    f, m,
-    // c, rf, mcd,
-    mehlbuyer
   ) ++ people.toList);
 
   def main(argv: Array[String]) {
@@ -42,11 +22,7 @@ object TradingExample {
 
   val simu = new Simulation;
 
-  val s = new Source(Wheat, 4, 1000*100, simu);
-  val t = new Trader(Wheat, 1,           simu);
-  val b = new  Buyer(Wheat, () => 1,     simu);
-
-  simu.init(List(s, t, b));
+  simu.init(List());
   simu.run(4);
 /* After 4 steps we have
 (BalanceSheet(4000,4000,4000,0,0),ArrayBuffer(getreide -> 0@0))

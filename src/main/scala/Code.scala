@@ -1,7 +1,12 @@
+import java.util.UUID
+
+import Simulation.PersonInfo
 package code {
 
+  import Simulation.SimO
 
-abstract class Instruction
+
+  abstract class Instruction
 
 
 /** An instruction that can be directly executed. */
@@ -34,7 +39,6 @@ class __do(f : => Unit) extends SimpleInstruction {
   override def toString = "__do{?}"
 }
 object __do { def apply(f : => Unit) = new __do(f) }
-
 
 
 /** An instruction that needs to be compiled down to SimpleInstructions
@@ -85,6 +89,19 @@ object __if {
 }
 
 
+
+class __interact(_f : () => Any, var simo: SimO) extends SugarInstruction {
+  def func = _f
+}
+
+
+object __interact {
+  def apply(_f : () => Any, simo: SimO) =
+    new __interact(_f, simo)
+  def unapply(arg: __interact): Some[(() => Any, SimO)] =
+    Some((arg.func, arg.simo))
+}
+
 } // package code
 
 
@@ -115,7 +132,6 @@ def compile(p: Instruction) : Vector[SimpleInstruction] = {
     };
     block.map(i => f(i)).flatten
   }
-
   p match {
     case __if(cond, block) => {
       val v = compilev(block.toVector);
@@ -135,6 +151,14 @@ def compile(p: Instruction) : Vector[SimpleInstruction] = {
         if(i < k()) true
         else { i=0; false }
       }))
+    }
+    case __interact(f, simo) => {
+      compile(__if(true) (__do{
+        simo.sessions = f().asInstanceOf[UUID] :: simo.sessions
+      },
+      __dowhile{
+        __wait(1)
+      } (!(simo.inputMessages exists (m => m.session == simo.sessions.head)))))
     }
     case a @ _ if a.isInstanceOf[SimpleInstruction] =>
       Vector(a.asInstanceOf[SimpleInstruction])
